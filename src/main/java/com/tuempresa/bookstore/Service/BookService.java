@@ -23,4 +23,19 @@ public class BookService {
         }
         return bookRepository.searchByTitleOrAuthor(query.trim());
     }
+
+    public List<Book> search(String title, String author, String isbn) {
+        String t = normalize(title);
+        String a = normalize(author);
+        String i = normalize(isbn);
+
+        if (t.isEmpty() && a.isEmpty() && i.isEmpty()) {
+            return List.of();
+        }
+        return bookRepository.search(t, a, i);
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.trim();
+    }
 }

@@ -22,4 +22,13 @@ public class BookController {
     public List<Book> simpleSearch(@RequestParam("q") String query) {
         return bookService.simpleSearch(query);
     }
+
+    // Buscar por título, autor e ISBN con cualquier combinación
+    @GetMapping("/advanced-search")
+    public List<Book> advancedSearch(
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "author", required = false) String author,
+            @RequestParam(name = "isbn", required = false) String isbn) {
+        return bookService.search(title, author, isbn);
+    }
 }
