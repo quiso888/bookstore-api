@@ -14,6 +14,9 @@ import java.util.*;
  *   <li>Book 1:N Edition — the same book can have several editions
  *       (reprints, publishers, formats), each with its own ISBN,
  *       publication date, page count and price.</li>
+ *   <li>Book 1:N {@link Calification} — users can rate the book from 1 to 5,
+ *       whether or not they bought it from us.</li>
+ *   <li>Book 1:N {@link Review} — users can write textual reviews of the book.</li>
  * </ul>
  */
 @Entity
@@ -40,6 +43,12 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Edition> editions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Calification> califications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     protected Book() {
         // Required by JPA
@@ -115,11 +124,63 @@ public class Book {
     }
 
     /**
+     * Rule: every calification belongs to exactly one book; adding it syncs
+     * the owning side of the relationship ({@link Calification}'s book).
+     * Purchase history is not required.
+     */
+    public void addCalification(Calification calification) {
+        if (calification == null) {
+            throw new IllegalArgumentException("Calification cannot be null");
+        }
+        calification.assignBook(this);
+        califications.add(calification);
+    }
+
+    public void removeCalification(Calification calification) {
+        if (califications.remove(calification)) {
+            calification.assignBook(null);
+        }
+    }
+
+    /**
+     * Rule: every review belongs to exactly one book; adding it syncs the
+     * owning side of the relationship ({@link Review}'s book).
+     * Purchase history is not required.
+     */
+    public void addReview(Review review) {
+        if (review == null) {
+            throw new IllegalArgumentException("Review cannot be null");
+        }
+        review.assignBook(this);
+        reviews.add(review);
+    }
+
+    public void removeReview(Review review) {
+        if (reviews.remove(review)) {
+            review.assignBook(null);
+        }
+    }
+
+    /**
      * Rule: a book is only available for sale if it has at least one
      * registered edition.
      */
     public boolean isAvailable() {
         return !editions.isEmpty();
+    }
+
+    /**
+     * Returns the average score of all califications, if any exist.
+     */
+    public Optional<Double> getAverageCalification() {
+        if (califications.isEmpty()) {
+            return Optional.empty();
+        }
+        double average = califications.stream()
+                .mapToInt(Calification::getScore)
+                .average()
+                .orElse(0);
+        return Optional.of(average);
     }
 
     /**
@@ -150,6 +211,14 @@ public class Book {
 
     public List<Edition> getEditions() {
         return List.copyOf(editions);
+    }
+
+    public List<Calification> getCalifications() {
+        return List.copyOf(califications);
+    }
+
+    public List<Review> getReviews() {
+        return List.copyOf(reviews);
     }
 
     @Override
