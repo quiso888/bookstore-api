@@ -36,7 +36,7 @@ public class Review {
     @JoinColumn(name = "calification_id")
     private Calification calification;
 
-    @Column(nullable = false, length = 2000)
+    @Column(name = "comment_text", nullable = false, length = 2000)
     private String comment;
 
     protected Review() {

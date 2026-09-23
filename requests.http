@@ -1,0 +1,113 @@
+### =========================================================
+### Bookstore API - Peticiones de prueba
+### =========================================================
+### Datos de referencia usados en estas peticiones (deben existir
+### previamente en la base de datos, quemados vía INSERT):
+###
+### USERS:
+###   id 1 -> username: jperez  | email: jperez@example.com
+###   id 2 -> username: mgomez  | email: mgomez@example.com
+###
+### AUTHORS:
+###   id 1 -> Gabriel García Márquez (Colombia)
+###   id 2 -> Isabel Allende (Chile)
+###
+### BOOKS:
+###   id 1 -> "Cien años de soledad" (genero: Realismo mágico) - autor id 1
+###   id 2 -> "La casa de los espíritus" (genero: Realismo mágico) - autor id 2
+###
+### EDITIONS:
+###   id 1 -> book_id 1 | isbn 9780307474728 | 471 pag | $25.99 | Sudamericana | ed. 1
+###   id 2 -> book_id 2 | isbn 9788401340534 | 433 pag | $22.50 | Plaza & Janés | ed. 1
+### =========================================================
+
+@baseUrl = http://localhost:8080
+
+### =========================================================
+### Historia 1: "A user can do a basic simple search that searches
+### for a word or phrase in both the author and title fields."
+### =========================================================
+
+### Búsqueda simple por texto que coincide con el título
+GET {{baseUrl}}/api/books/search?q=soledad
+
+### Búsqueda simple por texto que coincide con el autor
+GET {{baseUrl}}/api/books/search?q=Allende
+
+
+### =========================================================
+### Historia 2: "A user can search for books by entering values in
+### any combination of author, title and ISBN"
+### =========================================================
+
+### Búsqueda avanzada solo por título
+GET {{baseUrl}}/api/books/advanced-search?title=Cien años de soledad
+
+### Búsqueda avanzada solo por autor
+GET {{baseUrl}}/api/books/advanced-search?author=García Márquez
+
+### Búsqueda avanzada solo por ISBN
+GET {{baseUrl}}/api/books/advanced-search?isbn=9788401340534
+
+### Búsqueda avanzada combinando título + autor
+GET {{baseUrl}}/api/books/advanced-search?title=espíritus&author=Allende
+
+### Búsqueda avanzada combinando título + autor + ISBN
+GET {{baseUrl}}/api/books/advanced-search?title=Cien años de soledad&author=García Márquez&isbn=9780307474728
+
+
+### =========================================================
+### Historia 3: "A user can rate books from 1 (bad) to 5 (good).
+### The book does not have to be one the user bought from us"
+### =========================================================
+
+### Calificar el libro 1 con 5 (jperez)
+POST {{baseUrl}}/api/califications?userId=1&bookId=1&score=5
+
+### Calificar el libro 2 con 4 (mgomez)
+POST {{baseUrl}}/api/califications?userId=2&bookId=2&score=4
+
+### Consultar todas las calificaciones de un libro
+GET {{baseUrl}}/api/califications?bookId=1
+
+### Consultar todas las calificaciones hechas por un usuario
+GET {{baseUrl}}/api/califications?userId=1
+
+### Consultar el promedio de calificación de un libro
+GET {{baseUrl}}/api/califications/average?bookId=1
+
+
+### =========================================================
+### Historia 4: "A user can write a review of a book. She can preview
+### the review before submitting it. The book does not have to be
+### one the user bought from us"
+### =========================================================
+
+### Paso 1: Previsualizar la reseña (NO la guarda todavía)
+POST {{baseUrl}}/api/reviews/preview?userId=1&bookId=1&comment=Una obra maestra del realismo mágico, totalmente recomendada
+
+### Paso 2: Confirmar y guardar la reseña (una vez revisada la previsualización)
+POST {{baseUrl}}/api/reviews?userId=1&bookId=1&comment=Una obra maestra del realismo mágico, totalmente recomendada
+
+### Crear una reseña vinculada a una calificación existente
+POST {{baseUrl}}/api/reviews?userId=2&bookId=2&comment=Una historia familiar hermosa y conmovedora&calificationId=2
+
+### Consultar todas las reseñas de un libro
+GET {{baseUrl}}/api/reviews?bookId=1
+
+### Consultar todas las reseñas escritas por un usuario
+GET {{baseUrl}}/api/reviews?userId=1
+
+
+### =========================================================
+### Casos adicionales de error
+### =========================================================
+
+### Calificar con un score fuera de rango (1-5) -> debe fallar
+POST {{baseUrl}}/api/califications?userId=1&bookId=2&score=7
+
+### Previsualizar una reseña con comentario vacío -> debe fallar
+POST {{baseUrl}}/api/reviews/preview?userId=1&bookId=1&comment=
+
+### Previsualizar una reseña para un libro inexistente -> debe fallar
+POST {{baseUrl}}/api/reviews/preview?userId=1&bookId=999&comment=Cualquier comentario

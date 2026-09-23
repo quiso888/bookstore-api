@@ -1,4 +1,4 @@
-package com.tuempresa.bookstore.service;
+package com.tuempresa.bookstore.Service;
 
 import com.tuempresa.bookstore.model.Book;
 import com.tuempresa.bookstore.model.Calification;
@@ -39,6 +39,33 @@ public class ReviewService {
      */
     @Transactional
     public Review createReview(Long userId, Long bookId, String comment, Long calificationId) {
+        Review review = buildReview(userId, bookId, comment, calificationId);
+        return reviewRepository.save(review);
+    }
+
+    /**
+     * Builds and returns a review exactly as {@link #createReview} would,
+     * running the same lookups and business validations, but WITHOUT
+     * persisting it. Lets the user preview how the review will look before
+     * confirming it.
+     * <p>
+     * The transaction is marked {@code readOnly = true} on purpose: Spring's
+     * Hibernate integration switches the persistence context to manual flush
+     * mode for read-only transactions, so even though {@code book.addReview}
+     * attaches the in-memory review to the (cascading) Book.reviews
+     * collection, Hibernate never flushes that change to the database and
+     * nothing is written. Only {@link #createReview} actually saves.
+     */
+    @Transactional(readOnly = true)
+    public Review previewReview(Long userId, Long bookId, String comment, Long calificationId) {
+        return buildReview(userId, bookId, comment, calificationId);
+    }
+
+    /**
+     * Loads the user, book and (optional) calification, and assembles a
+     * fully linked, in-memory {@link Review}. Does not touch the repository.
+     */
+    private Review buildReview(Long userId, Long bookId, String comment, Long calificationId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
         Book book = bookRepository.findById(bookId)
@@ -55,7 +82,7 @@ public class ReviewService {
         }
 
         book.addReview(review);
-        return reviewRepository.save(review);
+        return review;
     }
 
     @Transactional(readOnly = true)
