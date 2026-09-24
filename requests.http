@@ -51,24 +51,13 @@ GET {{baseUrl}}/api/califications/average?bookId=1
 POST {{baseUrl}}/api/reviews/preview?userId=1&bookId=1&comment=Una obra maestra del realismo mágico, totalmente recomendada
 
 ### Paso 2: Confirmar y guardar la reseña (una vez revisada la previsualización)
-POST {{baseUrl}}/api/reviews?userId=1&bookId=1&comment=Una obra maestra del realismo mágico, totalmente recomendada
+POST {{baseUrl}}/api/reviews?userId=1&bookId=1&comment=Una obra maestra del realismo mágico, totalmente recomendada&calificationId=4
 
 ### Crear una reseña vinculada a una calificación existente
-POST {{baseUrl}}/api/reviews?userId=2&bookId=2&comment=Una historia familiar hermosa y conmovedora&calificationId=2
+POST {{baseUrl}}/api/reviews?userId=2&bookId=2&comment=Una historia familiar hermosa y conmovedora&calificationId=5
 
 ### Consultar todas las reseñas de un libro
 GET {{baseUrl}}/api/reviews?bookId=1
 
 ### Consultar todas las reseñas escritas por un usuario
 GET {{baseUrl}}/api/reviews?userId=1
-
-// Historias que deben fallar por reglas de negocio
-
-### Calificar con un score fuera de rango (1-5) -> debe fallar
-POST {{baseUrl}}/api/califications?userId=1&bookId=2&score=7
-
-### Previsualizar una reseña con comentario vacío -> debe fallar
-POST {{baseUrl}}/api/reviews/preview?userId=1&bookId=1&comment=
-
-### Previsualizar una reseña para un libro inexistente -> debe fallar
-POST {{baseUrl}}/api/reviews/preview?userId=1&bookId=999&comment=Cualquier comentario
