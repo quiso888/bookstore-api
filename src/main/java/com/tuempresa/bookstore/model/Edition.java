@@ -1,5 +1,6 @@
 package com.tuempresa.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -137,6 +138,7 @@ public class Edition {
         return id;
     }
 
+    @JsonIgnore
     public Book getBook() {
         return book;
     }

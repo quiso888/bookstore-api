@@ -1,5 +1,6 @@
 package com.tuempresa.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.*;
@@ -213,10 +214,12 @@ public class Book {
         return List.copyOf(editions);
     }
 
+    @JsonIgnore
     public List<Calification> getCalifications() {
         return List.copyOf(califications);
     }
 
+    @JsonIgnore
     public List<Review> getReviews() {
         return List.copyOf(reviews);
     }

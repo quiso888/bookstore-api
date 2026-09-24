@@ -18,9 +18,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT DISTINCT b FROM Book b " +
             "LEFT JOIN b.authors a " +
             "LEFT JOIN b.editions e WHERE " +
-            "(:title = '' OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
-            "(:author = '' OR LOWER(a.name) LIKE LOWER(CONCAT('%', :author, '%'))) AND " +
-            "(:isbn = '' OR e.isbn = :isbn)")
+            "(:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:author IS NULL OR LOWER(a.name) LIKE LOWER(CONCAT('%', :author, '%'))) AND " +
+            "(:isbn IS NULL OR e.isbn = :isbn)")
     List<Book> search(@Param("title") String title,
                       @Param("author") String author,
                       @Param("isbn") String isbn);

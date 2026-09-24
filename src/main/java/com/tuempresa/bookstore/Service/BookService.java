@@ -32,7 +32,11 @@ public class BookService {
         if (t.isEmpty() && a.isEmpty() && i.isEmpty()) {
             return List.of();
         }
-        return bookRepository.search(t, a, i);
+        return bookRepository.search(
+                t.isEmpty() ? null : t,
+                a.isEmpty() ? null : a,
+                i.isEmpty() ? null : i
+        );
     }
 
     private String normalize(String value) {

@@ -1,5 +1,6 @@
 package com.tuempresa.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -109,6 +110,7 @@ public class Author {
      * {@link Book#addAuthor(Author)} / {@link Book#removeAuthor(Author)},
      * which keep both sides of the relationship in sync.
      */
+    @JsonIgnore
     public Set<Book> getBooks() {
         return Set.copyOf(books);
     }
